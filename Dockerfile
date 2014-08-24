@@ -7,6 +7,15 @@
 # Pull base image.
 FROM dockerfile/ubuntu
 
+ADD config/mongodb.conf /config/mongodb.conf
+
+ADD scripts/configure-admin-account.sh /scripts/configure-admin-account.sh
+ADD scripts/create-admin-account.js /scripts/create-admin-account.js
+ADD scripts/start-mongod.sh /scripts/start-mongod.sh
+
+RUN chmod 755 /scripts/start-mongod.sh
+RUN chmod 755 /scripts/configure-admin-account.sh
+
 # Install MongoDB.
 RUN \
   apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10 && \
@@ -19,10 +28,10 @@ RUN \
 VOLUME ["/data"]
 
 # Define working directory.
-WORKDIR /data
+WORKDIR /scripts
 
-# Define default command.
-CMD ["mongod"]
+# Start the server for a first time.
+CMD /scripts/start-mongod.sh
 
 # Expose ports.
 #   - 27017: process
